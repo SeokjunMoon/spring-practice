@@ -14,7 +14,7 @@
     <title>Get Day</title>
 </head>
 <body>
-    <h1>year = ${year}</h1>
-    <p>${year}년 ${month}월 ${date}일은 ${day}요일 입니다.</p>
+    <h1>year = ${myDate.year}</h1>
+    <p>${myDate.year}년 ${myDate.month}월 ${myDate.date}일은 ${day}요일 입니다.</p>
 </body>
 </html>

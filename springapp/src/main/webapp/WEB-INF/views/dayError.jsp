@@ -11,6 +11,7 @@
     <title>Day Error</title>
 </head>
 <body>
-
+    <h1>Error</h1>
+    <p>년, 월, 일을 정확히 입력해주세요</p>
 </body>
 </html>
