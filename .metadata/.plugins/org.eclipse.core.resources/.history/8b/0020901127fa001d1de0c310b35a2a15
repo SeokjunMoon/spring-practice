@@ -1,0 +1,6 @@
+package com.kakaotech.practice.controller;
+
+public class Car    { 
+	private String color = "red"; 
+	public String getColor() { return color; }
+}
