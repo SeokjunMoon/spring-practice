@@ -11,7 +11,7 @@
     <title>Login</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.min.css" />
     <style>
-        * { box-sizing:border-box; }
+        * { box-sizing: border-box; }
         a { text-decoration: none; }
         form {
             width:400px;
