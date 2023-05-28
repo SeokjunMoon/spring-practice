@@ -1,6 +1,7 @@
 package com.kakaotech.springbasic.controller;
 
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.kakaotech.springbasic.classes.User;
 import com.kakaotech.springbasic.validator.UserValidator;
 import jakarta.validation.Valid;
@@ -10,10 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
@@ -28,7 +26,8 @@ public class RegisterController {
 //        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
 //        binder.registerCustomEditor(Date.class, new CustomDateEditor(dateFormat, false));
         binder.registerCustomEditor(String[].class, new StringArrayPropertyEditor("#"));
-        binder.setValidator(new UserValidator());
+//        binder.setValidator(new UserValidator()); // 자동 검증
+//        binder.addValidators(new UserValidator());
     }
 
     @RequestMapping(value = "/add", method = {RequestMethod.GET, RequestMethod.POST})
@@ -37,15 +36,23 @@ public class RegisterController {
     }
 
     @PostMapping("/save")
-    public String save(@Valid User user, BindingResult result, Model model) throws Exception {
+    public String save(@ModelAttribute("user") @Valid User user, BindingResult result, Model model) throws Exception {
         System.out.println("result = " + result);
         System.out.println("user = " + user);
 
-        if (!isValid(user)) {
-            String msg = URLEncoder.encode("id를 잘못 입력하였습니다.", "utf-8");
-            model.addAttribute("msg", msg);
-            return "forward:/register/add";
+//        이건 수동 검증
+//        UserValidator userValidator = new UserValidator();
+//        userValidator.validate(user, result);
+
+        if (result.hasErrors()) {
+            return "registerForm";
         }
+
+//        if (!isValid(user)) {
+//            String msg = URLEncoder.encode("id를 잘못 입력하였습니다.", "utf-8");
+//            model.addAttribute("msg", msg);
+//            return "forward:/register/add";
+//        }
         return "registerInfo";
     }
 
