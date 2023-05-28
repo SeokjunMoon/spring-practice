@@ -95,6 +95,8 @@
             <label><input type="checkbox" name="sns" value="kakaotalk"/>카카오톡</label>
             <label><input type="checkbox" name="sns" value="instagram"/>인스타그램</label>
         </div>
+        <label for="">취미</label>
+        <input class="input-field" type="text" name="hobby">
         <button>회원 가입</button>
     </form>
     <script>
