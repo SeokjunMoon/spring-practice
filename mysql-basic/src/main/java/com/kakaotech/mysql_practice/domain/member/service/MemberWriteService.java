@@ -11,12 +11,14 @@ import org.springframework.stereotype.Service;
 public class MemberWriteService {
     final private MemberRepository memberRepository;
 
-    public void create(RegisterMemberCommand command) {
+    public Member register(RegisterMemberCommand command) {
         Member member = Member.builder()
                 .nickname(command.nickname())
                 .email(command.email())
                 .birthday(command.birthday())
                 .build();
         memberRepository.save(member);
+
+        return member;
     }
 }
