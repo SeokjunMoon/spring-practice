@@ -1,6 +1,7 @@
 package com.kakaotech.mysql_practice.controller;
 
 import com.kakaotech.mysql_practice.domain.member.dto.MemberDto;
+import com.kakaotech.mysql_practice.domain.member.dto.MemberNicknameHistoryDto;
 import com.kakaotech.mysql_practice.domain.member.dto.RegisterMemberCommand;
 import com.kakaotech.mysql_practice.domain.member.entity.Member;
 import com.kakaotech.mysql_practice.domain.member.service.MemberReadService;
@@ -8,13 +9,15 @@ import com.kakaotech.mysql_practice.domain.member.service.MemberWriteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @RestController
 public class MemberController {
     final private MemberWriteService memberWriteService;
     final private MemberReadService memberReadService;
 
-    @PostMapping("/members")
+    @PostMapping
     public MemberDto register(@RequestBody RegisterMemberCommand command) {
         Member member = memberWriteService.register(command);
         return memberReadService.toDto(member);
@@ -27,9 +30,19 @@ public class MemberController {
 
         -> dto에 도입하자
      */
-    @GetMapping("/members/{id}")
+    @GetMapping("/{id}")
     public MemberDto getMemeber(@PathVariable Long id) {
-        var member = memberReadService.getMember(id);
-        return memberReadService.toDto(member);
+        return memberReadService.getMember(id);
+    }
+
+    @PostMapping("/{id}/name")
+    public MemberDto changeNickname(@PathVariable Long id, @RequestBody String nickname) {
+        memberWriteService.changeNickname(id, nickname);
+        return memberReadService.getMember(id);
+    }
+
+    @GetMapping("/{memberId}/nickname-histories")
+    public List<MemberNicknameHistoryDto> getNicknameHistories(@PathVariable Long memberId) {
+        return memberReadService.getNicknameHistories(memberId);
     }
 }
