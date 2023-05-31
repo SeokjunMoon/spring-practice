@@ -1,4 +1,4 @@
-package com.kakaotech.mysql_practice.controller;
+package com.kakaotech.mysql_practice.application.controller;
 
 import com.kakaotech.mysql_practice.domain.member.dto.MemberDto;
 import com.kakaotech.mysql_practice.domain.member.dto.MemberNicknameHistoryDto;
