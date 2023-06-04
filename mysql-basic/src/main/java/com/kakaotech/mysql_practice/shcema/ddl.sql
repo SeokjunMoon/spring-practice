@@ -50,5 +50,18 @@ create index POST__index_member_id
 create index POST__index_created_date
     on POST (createdDate);
 
+create index POST__index_member_id_created_date
+    on POST (memberId, createdDate);
 
+select count(*)
+from POST;
 
+explain SELECT memberId, createdDate, count(id)
+FROM POST
+WHERE memberId = 6 and createdDate between '2000-01-01' and '2023-12-31'
+GROUP BY memberId, createdDate;
+
+explain SELECT memberId, createdDate, count(id)
+FROM POST use index (POST__index_member_id)
+WHERE memberId = 6 and createdDate between '2000-01-01' and '2023-12-31'
+GROUP BY memberId, createdDate;

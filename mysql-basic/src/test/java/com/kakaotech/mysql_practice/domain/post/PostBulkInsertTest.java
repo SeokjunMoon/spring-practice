@@ -20,8 +20,8 @@ public class PostBulkInsertTest  {
     public void bulkInsert() {
         var easyRandom = PostFixtureFactory.get(
                 6L,
-                LocalDate.of(2023, 5, 1),
-                LocalDate.of(2023, 6, 3)
+                LocalDate.of(2000, 1, 1),
+                LocalDate.of(2023, 12, 31)
         );
 
         var stopWatch = new StopWatch();
@@ -34,7 +34,7 @@ public class PostBulkInsertTest  {
 //                    postRepository.save(x);
 //                });
 
-        var posts = IntStream.range(0, 10000 * 100)
+        var posts = IntStream.range(0, 10000 * 100 * 3)
                 .parallel()
                 .mapToObj(i -> easyRandom.nextObject(Post.class))
                 .toList();
@@ -48,7 +48,7 @@ public class PostBulkInsertTest  {
         postRepository.bulkInsert(posts);
 
         queryStopWatch.stop();
-        System.out.println("객체 생성 시간 : " + queryStopWatch.getTotalTimeSeconds());
+        System.out.println("sql 삽입 시간 : " + queryStopWatch.getTotalTimeSeconds());
 
     }
 }
