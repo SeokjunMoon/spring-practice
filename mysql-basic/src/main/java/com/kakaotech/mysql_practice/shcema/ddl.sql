@@ -65,3 +65,10 @@ explain SELECT memberId, createdDate, count(id)
 FROM POST use index (POST__index_member_id)
 WHERE memberId = 6 and createdDate between '2000-01-01' and '2023-12-31'
 GROUP BY memberId, createdDate;
+
+select *
+from POST
+where memberId = 6
+order by
+limit 2
+offset 2;
