@@ -6,6 +6,8 @@ import com.kakaotech.mysql_practice.domain.post.dto.PostCommand;
 import com.kakaotech.mysql_practice.domain.post.entity.Post;
 import com.kakaotech.mysql_practice.domain.post.service.PostReadService;
 import com.kakaotech.mysql_practice.domain.post.service.PostWriteService;
+import com.kakaotech.mysql_practice.util.CursorRequest;
+import com.kakaotech.mysql_practice.util.PageCursor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -37,5 +39,13 @@ public class PostController {
             Pageable pageable
     ) {
         return postReadService.getPosts(memberId, pageable);
+    }
+
+    @GetMapping("/members/{memberId}/by-cursor")
+    public PageCursor<Post> getPostsByCursor(
+            @PathVariable Long memberId,
+            CursorRequest cursorRequest
+    ) {
+        return postReadService.getPosts(memberId, cursorRequest);
     }
 }

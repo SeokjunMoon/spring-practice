@@ -69,6 +69,5 @@ GROUP BY memberId, createdDate;
 select *
 from POST
 where memberId = 6
-order by
 limit 2
 offset 2;

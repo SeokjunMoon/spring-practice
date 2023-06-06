@@ -1,4 +1,4 @@
-package com.kakaotech.mysql_practice.domain;
+package com.kakaotech.mysql_practice.util;
 
 import org.springframework.data.domain.Sort;
 
