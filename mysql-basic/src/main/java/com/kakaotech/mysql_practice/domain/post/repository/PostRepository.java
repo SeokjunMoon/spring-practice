@@ -97,7 +97,25 @@ public class PostRepository {
         return namedParameterJdbcTemplate.query(sql, params, ROW_MAPPER);
     }
 
-    public List<Post> findAllByLessThanMemberIdAndOrderByIdDesc(Long id, Long memberId, int size) {
+    public List<Post> findAllByInMemberIdsAndOrderByIdDesc(List<Long> memberIds, int size) {
+        if (memberIds.isEmpty()) {
+            return List.of();
+        }
+
+        var sql = String.format("""
+                SELECT *
+                FROM %s
+                WHERE memberId in (:memberIds)
+                ORDER BY id desc
+                LIMIT :size
+                """, TABLE);
+        var params = new MapSqlParameterSource()
+                .addValue("memberIds", memberIds)
+                .addValue("size", size);
+        return namedParameterJdbcTemplate.query(sql, params, ROW_MAPPER);
+    }
+
+    public List<Post> findAllByLessThanIdAndMemberIdAndOrderByIdDesc(Long id, Long memberId, int size) {
         var sql = String.format("""
                 SELECT *
                 FROM %s
@@ -108,6 +126,25 @@ public class PostRepository {
         var params = new MapSqlParameterSource()
                 .addValue("id", id)
                 .addValue("memberId", memberId)
+                .addValue("size", size);
+        return namedParameterJdbcTemplate.query(sql, params, ROW_MAPPER);
+    }
+
+    public List<Post> findAllByLessThanIdAndInMemberIdsAndOrderByIdDesc(Long id, List<Long> memberIds, int size) {
+        if (memberIds.isEmpty()) {
+            return List.of();
+        }
+
+        var sql = String.format("""
+                SELECT *
+                FROM %s
+                WHERE memberId in (:memberIds) and id < :id
+                ORDER BY id desc
+                LIMIT :size
+                """, TABLE);
+        var params = new MapSqlParameterSource()
+                .addValue("id", id)
+                .addValue("memberIds", memberIds)
                 .addValue("size", size);
         return namedParameterJdbcTemplate.query(sql, params, ROW_MAPPER);
     }
