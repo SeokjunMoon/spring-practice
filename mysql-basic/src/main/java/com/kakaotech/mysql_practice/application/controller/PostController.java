@@ -1,5 +1,6 @@
 package com.kakaotech.mysql_practice.application.controller;
 
+import com.kakaotech.mysql_practice.application.usecase.CreatePostUsecase;
 import com.kakaotech.mysql_practice.application.usecase.GetTimelinePostsUsecase;
 import com.kakaotech.mysql_practice.domain.post.dto.DailyPostCount;
 import com.kakaotech.mysql_practice.domain.post.dto.DailyPostCountRequest;
@@ -23,10 +24,11 @@ public class PostController {
     final private PostWriteService postWriteService;
     final private PostReadService postReadService;
     final private GetTimelinePostsUsecase getTimelinePostsUsecase;
+    final private CreatePostUsecase createPostUsecase;
 
     @PostMapping("")
     public Long create(PostCommand command) {
-        return postWriteService.create(command);
+        return createPostUsecase.execute(command);
     }
 
 //    @PostMapping("/daily-post-counts")
@@ -56,6 +58,13 @@ public class PostController {
             @PathVariable Long memberId,
             CursorRequest cursorRequest
     ) {
-        return getTimelinePostsUsecase.execute(memberId, cursorRequest);
+//        return getTimelinePostsUsecase.execute(memberId, cursorRequest);
+        return getTimelinePostsUsecase.executeByTimeline(memberId, cursorRequest);
+    }
+
+    @PostMapping("/{postId}")
+    public void likePost(@PathVariable Long postId) {
+//        postWriteService.likePost(postId);
+        postWriteService.likePostByOptimisticLock(postId);
     }
 }

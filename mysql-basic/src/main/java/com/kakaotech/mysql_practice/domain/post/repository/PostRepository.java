@@ -20,6 +20,7 @@ import java.sql.ResultSet;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Repository
@@ -32,6 +33,8 @@ public class PostRepository {
             .memberId(resultSet.getLong("memberId"))
             .contents(resultSet.getString("contents"))
             .createdDate(resultSet.getObject("createdDate", LocalDate.class))
+            .likeCount(resultSet.getLong("likeCount"))
+            .version(resultSet.getLong("version"))
             .createdAt(resultSet.getObject("createdAt", LocalDateTime.class))
             .build();
 
@@ -52,6 +55,19 @@ public class PostRepository {
         );
 
         return namedParameterJdbcTemplate.query(sql, params, mapper);
+    }
+
+    public Optional<Post> findById(Long postId, boolean requiredLock) {
+        var params = new MapSqlParameterSource().addValue("postId", postId);
+        var sql = String.format("SELECT * FROM %s WHERE ID = :postId", TABLE);
+
+        if (requiredLock) {
+            sql += "FOR UPDATE";
+        }
+
+        var nullablePost = namedParameterJdbcTemplate.queryForObject(sql, params, ROW_MAPPER);
+
+        return Optional.ofNullable(nullablePost);
     }
 
     public Page<Post> findAllByMemberId(Long memberId, Pageable pageable) {
@@ -115,6 +131,21 @@ public class PostRepository {
         return namedParameterJdbcTemplate.query(sql, params, ROW_MAPPER);
     }
 
+    public List<Post> findAllByInIds(List<Long> ids) {
+        if (ids.isEmpty()) {
+            return List.of();
+        }
+
+        var sql = String.format("""
+                SELECT *
+                FROM %s
+                WHERE id in (:ids)
+                """, TABLE);
+        var params = new MapSqlParameterSource()
+                .addValue("ids", ids);
+        return namedParameterJdbcTemplate.query(sql, params, ROW_MAPPER);
+    }
+
     public List<Post> findAllByLessThanIdAndMemberIdAndOrderByIdDesc(Long id, Long memberId, int size) {
         var sql = String.format("""
                 SELECT *
@@ -153,7 +184,7 @@ public class PostRepository {
         if (post.getId() == null) {
             return insert(post);
         }
-        throw new UnsupportedOperationException("Post는 업데이트를 지원하지 않습니다.");
+        return update(post);
     }
 
     public void bulkInsert(List<Post> posts) {
@@ -183,7 +214,29 @@ public class PostRepository {
                 .memberId(post.getMemberId())
                 .contents(post.getContents())
                 .createdDate(post.getCreatedDate())
+                .likeCount(post.getLikeCount())
                 .createdAt(post.getCreatedAt())
                 .build();
+    }
+
+    private Post update(Post post) {
+        var sql = String.format("""
+                UPDATE %s set
+                    memberId = :memberId,
+                    contents = :contents,
+                    createdDate = :createdDate,
+                    likeCount = :likeCount,
+                    version = :version + 1,
+                    createdAt = :createdAt
+                WHERE id = :id and version = :version
+                """, TABLE);
+        SqlParameterSource parameterSource = new BeanPropertySqlParameterSource(post);
+        var updateCount = namedParameterJdbcTemplate.update(sql, parameterSource);
+
+        if (updateCount == 0) {
+            throw new RuntimeException("업데이트 실패");
+        }
+
+        return post;
     }
 }

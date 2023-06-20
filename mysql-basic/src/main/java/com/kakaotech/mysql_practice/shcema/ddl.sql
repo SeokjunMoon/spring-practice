@@ -71,3 +71,18 @@ from POST
 where memberId = 6
 limit 2
 offset 2;
+
+create table Timeline
+(
+    id int auto_increment,
+    memberId int not null,
+    postId int not null,
+    createdAt datetime not null,
+    constraint Timeline_id_uindex
+        primary key (id)
+    # 인덱스 추가해서 성능 테스트 진행해보자
+);
+
+alter table POST add column likeCount int;
+
+alter table POST add column version int default 0;

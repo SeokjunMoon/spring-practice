@@ -17,7 +17,15 @@ public class FollowReadService {
         return followRepository
                 .findAllByFromMemberId(memberId)
                 .stream()
-                .map(follow -> toDto(follow))
+                .map(this::toDto)
+                .toList();
+    }
+
+    public List<FollowDto> getFollowers(Long memberId) {
+        return followRepository
+                .findAllByToMemberId(memberId)
+                .stream()
+                .map(this::toDto)
                 .toList();
     }
 

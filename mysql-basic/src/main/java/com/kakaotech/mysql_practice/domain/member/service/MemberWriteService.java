@@ -7,6 +7,7 @@ import com.kakaotech.mysql_practice.domain.member.repository.MemberNicknameHisto
 import com.kakaotech.mysql_practice.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -15,6 +16,7 @@ public class MemberWriteService {
 
     final private MemberNicknameHistoryRepository memberNicknameHistoryRepository;
 
+    @Transactional
     public Member register(RegisterMemberCommand command) {
         Member member = Member.builder()
                 .nickname(command.nickname())
@@ -28,6 +30,7 @@ public class MemberWriteService {
         return savedMember;
     }
 
+    @Transactional
     public void changeNickname(Long memberId, String nickname) {
         var member = memberRepository.findById(memberId).orElseThrow();
         member.changeNickname(nickname);
