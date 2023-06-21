@@ -101,4 +101,17 @@ alter table Member add column userId varchar(20) not null;
 
 alter table Member add column userPassword varchar(20) not null;
 
-truncate Timeline
+truncate Timeline;
+
+create table Comment
+(
+    id int auto_increment,
+    postId int not null,
+    commentId int,
+    contents varchar(200) not null,
+    createdAt datetime not null,
+    constraint Comment_id_uindex
+        primary key (id)
+);
+
+alter table Comment add column memberId int not null;

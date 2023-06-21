@@ -3,11 +3,11 @@ package com.kakaotech.mysql_practice.application.controller;
 import com.kakaotech.mysql_practice.application.usecase.CreatePostLikeUsecase;
 import com.kakaotech.mysql_practice.application.usecase.CreatePostUsecase;
 import com.kakaotech.mysql_practice.application.usecase.GetTimelinePostsUsecase;
-import com.kakaotech.mysql_practice.domain.post.dto.DailyPostCount;
-import com.kakaotech.mysql_practice.domain.post.dto.DailyPostCountRequest;
-import com.kakaotech.mysql_practice.domain.post.dto.PostCommand;
-import com.kakaotech.mysql_practice.domain.post.dto.PostDto;
+import com.kakaotech.mysql_practice.domain.post.dto.*;
+import com.kakaotech.mysql_practice.domain.post.entity.Comment;
 import com.kakaotech.mysql_practice.domain.post.entity.Post;
+import com.kakaotech.mysql_practice.domain.post.service.CommentReadService;
+import com.kakaotech.mysql_practice.domain.post.service.CommentWriteService;
 import com.kakaotech.mysql_practice.domain.post.service.PostReadService;
 import com.kakaotech.mysql_practice.domain.post.service.PostWriteService;
 import com.kakaotech.mysql_practice.util.CursorRequest;
@@ -28,6 +28,8 @@ public class PostController {
     final private GetTimelinePostsUsecase getTimelinePostsUsecase;
     final private CreatePostUsecase createPostUsecase;
     final private CreatePostLikeUsecase createPostLikeUsecase;
+    final private CommentReadService commentReadService;
+    final private CommentWriteService commentWriteService;
 
     @PostMapping("")
     public Long create(PostCommand command) {
@@ -74,5 +76,18 @@ public class PostController {
     @PostMapping("/{postId}/v2")
     public void likePost2(@PathVariable Long postId, @RequestParam Long memberId) {
         createPostLikeUsecase.execute(postId, memberId);
+    }
+
+    @PostMapping("/comments/")
+    public Long create(CommentCommand commend) {
+        return commentWriteService.create(commend);
+    }
+
+    @GetMapping("/comments/{postId}/by-cursor")
+    public PageCursor<Comment> getComments(
+            @PathVariable Long postId,
+            CursorRequest cursorRequest
+    ) {
+        return commentReadService.getComments(postId, cursorRequest);
     }
 }
