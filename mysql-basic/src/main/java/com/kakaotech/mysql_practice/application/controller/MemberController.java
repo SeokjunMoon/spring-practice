@@ -31,7 +31,7 @@ public class MemberController {
         -> dto에 도입하자
      */
     @GetMapping("/{id}")
-    public MemberDto getMemeber(@PathVariable Long id) {
+    public MemberDto getMember(@PathVariable Long id) {
         return memberReadService.getMember(id);
     }
 
@@ -44,5 +44,11 @@ public class MemberController {
     @GetMapping("/{memberId}/nickname-histories")
     public List<MemberNicknameHistoryDto> getNicknameHistories(@PathVariable Long memberId) {
         return memberReadService.getNicknameHistories(memberId);
+    }
+
+    @PostMapping("/{id}/password")
+    public MemberDto changeUserPassword(@PathVariable Long id, @RequestBody String password) {
+        memberWriteService.changeUserPassword(id, password);
+        return memberReadService.getMember(id);
     }
 }

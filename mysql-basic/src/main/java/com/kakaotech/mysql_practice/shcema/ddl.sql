@@ -86,3 +86,19 @@ create table Timeline
 alter table POST add column likeCount int;
 
 alter table POST add column version int default 0;
+
+create table PostLike
+(
+    id int auto_increment,
+    memberId int not null,
+    postId int not null,
+    createdAt datetime not null,
+    constraint PostLike_id_uindex
+        primary key (id)
+);
+
+alter table Member add column userId varchar(20) not null;
+
+alter table Member add column userPassword varchar(20) not null;
+
+truncate Timeline

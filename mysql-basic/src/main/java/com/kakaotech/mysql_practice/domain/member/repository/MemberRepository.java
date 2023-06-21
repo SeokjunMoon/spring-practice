@@ -2,6 +2,7 @@ package com.kakaotech.mysql_practice.domain.member.repository;
 
 import com.kakaotech.mysql_practice.domain.member.entity.Member;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -10,10 +11,12 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
+import javax.swing.text.html.Option;
 import java.sql.ResultSet;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -35,6 +38,8 @@ public class MemberRepository {
             .nickname(resultSet.getString("nickname"))
             .birthday(resultSet.getObject("birthday", LocalDate.class))
             .createdAt(resultSet.getObject("createdAt", LocalDateTime.class))
+            .userId(resultSet.getString("userId"))
+            .userPassword(resultSet.getString("userPassword"))
             .build();
 
     public Optional<Member> findById(Long id) {
@@ -49,6 +54,19 @@ public class MemberRepository {
             return Optional.ofNullable(nullableMember);
          */
         var member = namedParameterJdbcTemplate.queryForObject(sql, params, ROW_MAPPER);
+        return Optional.ofNullable(member);
+    }
+
+    public Optional<Member> findByUserId(String userId) {
+        var sql = String.format("SELECT * FROM %s WHERE userId = :userId", TABLE);
+        var params = new MapSqlParameterSource().addValue("userId", userId);
+        Member member = null;
+
+        try {
+            member = namedParameterJdbcTemplate.queryForObject(sql, params, ROW_MAPPER);
+        }
+        catch (Exception error) {}
+
         return Optional.ofNullable(member);
     }
 
@@ -83,11 +101,20 @@ public class MemberRepository {
                 .nickname(member.getNickname())
                 .birthday(member.getBirthday())
                 .createdAt(member.getCreatedAt())
+                .userId(member.getUserId())
+                .userPassword(member.getUserPassword())
                 .build();
     }
 
     private Member update(Member member) {
-        var sql = String.format("UPDATE %s set email = :email, nickname = :nickname, birthday = :birthday WHERE id = :id", TABLE);
+        var sql = String.format("""
+            UPDATE %s set
+                email = :email,
+                nickname = :nickname,
+                birthday = :birthday,
+                userId = :userId,
+                userPassword = :userPassword
+            WHERE id = :id""", TABLE);
         SqlParameterSource params = new BeanPropertySqlParameterSource(member);
         namedParameterJdbcTemplate.update(sql, params);
         return member;

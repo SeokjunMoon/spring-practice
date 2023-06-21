@@ -24,14 +24,14 @@ public class MemberReadService {
 
     public List<MemberDto> getMembers(List<Long> ids) {
         var members = memberRepository.findAllByIdIn(ids);
-        return members.stream().map(member -> toDto(member)).toList();
+        return members.stream().map(this::toDto).toList();
     }
 
     public List<MemberNicknameHistoryDto> getNicknameHistories(Long memberId) {
         return memberNicknameHistoryRepository
                 .findAllByMemberId(memberId)
                 .stream()
-                .map(history -> toDto(history))
+                .map(this::toDto)
                 .toList();
     }
 
@@ -40,7 +40,12 @@ public class MemberReadService {
     }
 
     public MemberDto toDto(Member member) {
-        return new MemberDto(member.getId(), member.getEmail(), member.getNickname(), member.getBirthday());
+        return new MemberDto(
+                member.getId(),
+                member.getEmail(),
+                member.getNickname(),
+                member.getBirthday(),
+                member.getUserId());
     }
 
     private MemberNicknameHistoryDto toDto(MemberNicknameHistory history) {

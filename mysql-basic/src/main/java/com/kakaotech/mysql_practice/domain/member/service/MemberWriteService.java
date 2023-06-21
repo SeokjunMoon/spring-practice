@@ -6,6 +6,7 @@ import com.kakaotech.mysql_practice.domain.member.entity.MemberNicknameHistory;
 import com.kakaotech.mysql_practice.domain.member.repository.MemberNicknameHistoryRepository;
 import com.kakaotech.mysql_practice.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,12 +23,16 @@ public class MemberWriteService {
                 .nickname(command.nickname())
                 .email(command.email())
                 .birthday(command.birthday())
+                .userId(command.userId())
+                .userPassword(command.userPassword())
                 .build();
 
-        var savedMember = memberRepository.save(member);
-        saveMemberNicknameHistory(savedMember);
-
-        return savedMember;
+        if (isValidUserId(command.userId())) {
+            var savedMember = memberRepository.save(member);
+            saveMemberNicknameHistory(savedMember);
+            return savedMember;
+        }
+        else throw new DuplicateKeyException("중복된 아이디 입니다.");
     }
 
     @Transactional
@@ -47,5 +52,16 @@ public class MemberWriteService {
                 .build();
 
         memberNicknameHistoryRepository.save(history);
+    }
+
+    public boolean isValidUserId(String id) {
+        return memberRepository.findByUserId(id).isEmpty();
+    }
+
+    @Transactional
+    public void changeUserPassword(Long memberId, String password) {
+        var member = memberRepository.findById(memberId).orElseThrow();
+        member.changePassword(password);
+        memberRepository.save(member);
     }
 }

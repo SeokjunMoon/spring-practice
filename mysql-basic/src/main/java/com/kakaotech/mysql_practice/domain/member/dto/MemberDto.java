@@ -6,6 +6,8 @@ public record MemberDto(
         Long id,
         String email,
         String nickname,
-        LocalDate birthday
+        LocalDate birthday,
+
+        String userId
 ) {
 }
