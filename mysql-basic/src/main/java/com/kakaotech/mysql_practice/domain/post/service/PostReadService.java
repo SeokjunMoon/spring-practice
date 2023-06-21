@@ -2,7 +2,9 @@ package com.kakaotech.mysql_practice.domain.post.service;
 
 import com.kakaotech.mysql_practice.domain.post.dto.DailyPostCount;
 import com.kakaotech.mysql_practice.domain.post.dto.DailyPostCountRequest;
+import com.kakaotech.mysql_practice.domain.post.dto.PostDto;
 import com.kakaotech.mysql_practice.domain.post.entity.Post;
+import com.kakaotech.mysql_practice.domain.post.repository.PostLikeRepository;
 import com.kakaotech.mysql_practice.domain.post.repository.PostRepository;
 import com.kakaotech.mysql_practice.util.CursorRequest;
 import com.kakaotech.mysql_practice.util.PageCursor;
@@ -17,6 +19,7 @@ import java.util.List;
 @Service
 public class PostReadService {
     final private PostRepository postRepository;
+    final private PostLikeRepository postLikeRepository;
 
     public List<DailyPostCount> getDailyPostCounts(DailyPostCountRequest request) {
         /*
@@ -29,8 +32,17 @@ public class PostReadService {
         return postRepository.groupByCreatedDate(request);
     }
 
-    public Page<Post> getPosts(Long memberId, Pageable pageable) {
-        return postRepository.findAllByMemberId(memberId, pageable);
+    public Page<PostDto> getPosts(Long memberId, Pageable pageable) {
+        return postRepository.findAllByMemberId(memberId, pageable).map(this::toDto);
+    }
+
+    private PostDto toDto(Post post) {
+        return new PostDto(
+                post.getId(),
+                post.getContents(),
+                post.getCreatedAt(),
+                postLikeRepository.count(post.getId())
+        );
     }
 
     public PageCursor<Post> getPosts(Long memberId, CursorRequest cursorRequest) {
@@ -54,6 +66,10 @@ public class PostReadService {
             return postRepository.findAllByLessThanIdAndMemberIdAndOrderByIdDesc(cursorRequest.key(), memberId, cursorRequest.size());
         }
         return postRepository.findAllByMemberIdAndOrderByIdDesc(memberId, cursorRequest.size());
+    }
+
+    public Post getPost(Long postId) {
+        return postRepository.findById(postId, false).orElseThrow();
     }
 
     private List<Post> findAllBy(List<Long> memberIds, CursorRequest cursorRequest) {

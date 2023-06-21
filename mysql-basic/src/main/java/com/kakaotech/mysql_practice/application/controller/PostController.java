@@ -1,10 +1,12 @@
 package com.kakaotech.mysql_practice.application.controller;
 
+import com.kakaotech.mysql_practice.application.usecase.CreatePostLikeUsecase;
 import com.kakaotech.mysql_practice.application.usecase.CreatePostUsecase;
 import com.kakaotech.mysql_practice.application.usecase.GetTimelinePostsUsecase;
 import com.kakaotech.mysql_practice.domain.post.dto.DailyPostCount;
 import com.kakaotech.mysql_practice.domain.post.dto.DailyPostCountRequest;
 import com.kakaotech.mysql_practice.domain.post.dto.PostCommand;
+import com.kakaotech.mysql_practice.domain.post.dto.PostDto;
 import com.kakaotech.mysql_practice.domain.post.entity.Post;
 import com.kakaotech.mysql_practice.domain.post.service.PostReadService;
 import com.kakaotech.mysql_practice.domain.post.service.PostWriteService;
@@ -25,6 +27,7 @@ public class PostController {
     final private PostReadService postReadService;
     final private GetTimelinePostsUsecase getTimelinePostsUsecase;
     final private CreatePostUsecase createPostUsecase;
+    final private CreatePostLikeUsecase createPostLikeUsecase;
 
     @PostMapping("")
     public Long create(PostCommand command) {
@@ -38,7 +41,7 @@ public class PostController {
     }
 
     @GetMapping("/members/{memberId}")
-    public Page<Post> getPosts(
+    public Page<PostDto> getPosts(
             @PathVariable Long memberId,
             Pageable pageable
     ) {
@@ -62,9 +65,14 @@ public class PostController {
         return getTimelinePostsUsecase.executeByTimeline(memberId, cursorRequest);
     }
 
-    @PostMapping("/{postId}")
+    @PostMapping("/{postId}/v1")
     public void likePost(@PathVariable Long postId) {
 //        postWriteService.likePost(postId);
         postWriteService.likePostByOptimisticLock(postId);
+    }
+
+    @PostMapping("/{postId}/v2")
+    public void likePost2(@PathVariable Long postId, @RequestParam Long memberId) {
+        createPostLikeUsecase.execute(postId, memberId);
     }
 }
