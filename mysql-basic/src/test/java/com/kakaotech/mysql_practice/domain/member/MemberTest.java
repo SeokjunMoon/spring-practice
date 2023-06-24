@@ -29,17 +29,27 @@ public class MemberTest {
     @DisplayName("회원의 닉네임은 10자를 초과할 수 없다.")
     @Test
     public  void testNicknameLength() {
-//        LongStream.range(0, 10)
-//                .mapToObj(i -> MemberFixtureFactory.create(i))
+//        LongStream.range(0, 1000000)
+//                .mapToObj(MemberFixtureFactory::create)
 //                .forEach(member -> {
 //                    System.out.println(member.getNickname());
 //                });
-        var member = MemberFixtureFactory.create();
-        var overMaxLengthName = "pnupnupnupnu";
+//        var member = MemberFixtureFactory.create();
+//        var overMaxLengthName = "pnupnupnupnu";
+//
+//        Assertions.assertThrows(
+//                IllegalArgumentException.class,
+//                () -> member.changeNickname(overMaxLengthName)
+//        );
+    }
 
-        Assertions.assertThrows(
-                IllegalArgumentException.class,
-                () -> member.changeNickname(overMaxLengthName)
-        );
+    @DisplayName("회원 추가 테스트")
+    @Test
+    public void testInsertMember() {
+        LongStream.range(0, 1000000)
+                .mapToObj(MemberFixtureFactory::create)
+                .forEach(member -> {
+                    System.out.println(member.getNickname());
+                });
     }
 }

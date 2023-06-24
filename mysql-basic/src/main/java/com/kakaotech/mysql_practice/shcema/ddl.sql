@@ -115,3 +115,6 @@ create table Comment
 );
 
 alter table Comment add column memberId int not null;
+
+select count(id)
+from Follow;

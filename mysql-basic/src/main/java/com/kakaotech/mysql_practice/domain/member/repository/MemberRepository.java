@@ -87,6 +87,19 @@ public class MemberRepository {
         return update(member);
     }
 
+    public void bulkInsert(List<Member> members) {
+        var sql = String.format("""
+                INSERT INTO %s (email, nickname, birthday, createdAt, userId, userPassword)
+                VALUES (:email, :nickname, :birthday, :createdAt, :userId, :userPassword)
+                """, TABLE);
+
+        SqlParameterSource[] parameterSources = members.stream()
+                .map(BeanPropertySqlParameterSource::new)
+                .toArray(SqlParameterSource[]::new);
+
+        namedParameterJdbcTemplate.batchUpdate(sql, parameterSources);
+    }
+
     private Member insert(Member member) {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(namedParameterJdbcTemplate.getJdbcTemplate())
                 .withTableName("Member")

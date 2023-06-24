@@ -48,6 +48,19 @@ public class FollowRepository {
         throw new UnsupportedOperationException("Follow는 업데이트를 지원하지 않습니다.");
     }
 
+    public void bulkInsert(List<Follow> follows) {
+        var sql = String.format("""
+                INSERT INTO %s (fromMemberId, toMemberId, createdAt)
+                VALUES (:fromMemberId, :toMemberId, :createdAt)
+                """, TABLE);
+
+        SqlParameterSource[] parameterSources = follows.stream()
+                .map(BeanPropertySqlParameterSource::new)
+                .toArray(SqlParameterSource[]::new);
+
+        namedParameterJdbcTemplate.batchUpdate(sql, parameterSources);
+    }
+
     private Follow insert(Follow follow) {
         SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(namedParameterJdbcTemplate.getJdbcTemplate())
                 .withTableName(TABLE)
