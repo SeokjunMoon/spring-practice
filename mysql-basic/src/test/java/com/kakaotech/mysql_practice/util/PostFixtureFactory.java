@@ -41,4 +41,21 @@ public class PostFixtureFactory {
 
         return new EasyRandom(params);
     }
+
+    static public EasyRandom get(Long startId, Long endId, LocalDate startDate, LocalDate endDate) {
+        var idPredicate = named("id")
+                .and(ofType(Long.class))
+                .and(inClass(Post.class));
+
+        var memberIdPredicate = named("memberId")
+                .and(ofType(Long.class))
+                .and(inClass(Post.class));
+
+        var params = new EasyRandomParameters()
+                .excludeField(idPredicate)
+                .dateRange(startDate, endDate)
+                .randomize(memberIdPredicate, new LongRangeRandomizer(startId, endId));
+
+        return new EasyRandom(params);
+    }
 }
