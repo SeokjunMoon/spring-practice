@@ -117,4 +117,18 @@ create table Comment
 alter table Comment add column memberId int not null;
 
 select count(id)
+from POST;
+
+select count(id)
 from Follow;
+
+select count(id)
+from Member;
+
+truncate Follow;
+
+truncate POST;
+truncate Timeline;
+
+select count(id)
+from Timeline;

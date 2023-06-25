@@ -1,8 +1,11 @@
 package com.kakaotech.mysql_practice.domain.post;
 
+import com.kakaotech.mysql_practice.application.usecase.CreatePostUsecase;
+import com.kakaotech.mysql_practice.domain.post.dto.PostCommand;
 import com.kakaotech.mysql_practice.domain.post.entity.Post;
 import com.kakaotech.mysql_practice.domain.post.repository.PostRepository;
 import com.kakaotech.mysql_practice.util.PostFixtureFactory;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,6 +18,9 @@ import java.util.stream.IntStream;
 public class PostBulkInsertTest  {
     @Autowired
     private PostRepository postRepository;
+
+    @Autowired
+    private CreatePostUsecase createPostUsecase;
 
     @Test
     public void bulkInsert() {
@@ -44,10 +50,32 @@ public class PostBulkInsertTest  {
         StopWatch queryStopWatch = new StopWatch();
         queryStopWatch.start();
 
-        postRepository.bulkInsert(posts);
+        posts.stream().parallel().forEach(post -> {
+            createPostUsecase.execute(new PostCommand(post.getMemberId(), post.getContents()));
+        });
 
         queryStopWatch.stop();
         System.out.println("sql 삽입 시간 : " + queryStopWatch.getTotalTimeSeconds());
 
+    }
+
+    /*
+    2023-06-25 :
+    1차 : 9.861507959 초
+    2차 : 9.697758916 초
+    3차 : 9.517366292 초
+    4차 : 9.513005333 초
+    5차 : 9.377053166 초
+     */
+    @DisplayName("100만 팔로워의 포스트 추가 테스트")
+    @Test
+    public void insertPostTest() {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+
+        createPostUsecase.execute(new PostCommand(1L, "test post"));
+
+        stopWatch.stop();
+        System.out.println("작업 시간 : " + stopWatch.getTotalTimeSeconds());
     }
 }
